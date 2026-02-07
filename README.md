@@ -9,3 +9,12 @@
 - **Token Vault:** токены хранятся ТОЛЬКО на бэкенде в зашифрованном виде (никогда не покидают сервер)
 
 ![C4 diagram new](diagrams/BionicPRO_C4_model_task1.png)
+
+### Задача 2. Замена Code Grant на PKCE
+
+1. Добавлен параметр `pkceMethod`: 'S256' в `initOptions` (алгоритм SHA256 для хеширования)
+2. Включен Authorization Code Flow (требуется для PKCE)
+3. Отключен Resource Owner Password Credentials Grant (ROPC)
+4. PKCE с алгоритмом SHA256
+
+
