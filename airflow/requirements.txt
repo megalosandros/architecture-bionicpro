@@ -1,0 +1,21 @@
+# =========================================================================
+# BionicPRO Airflow ETL - Python Dependencies
+# =========================================================================
+
+# Airflow Core
+apache-airflow==2.9.1
+
+# Airflow Providers
+apache-airflow-providers-postgres==5.10.2  # Для подключения к PostgreSQL (CRM и Main DB)
+apache-airflow-providers-http==4.10.0      # Для HTTP операций
+
+# Database Drivers
+psycopg2-binary==2.9.9      # PostgreSQL adapter (для CRM и основной БД)
+clickhouse-driver==0.2.7    # ClickHouse Python driver
+
+# Data Processing
+pandas==2.0.3               # Для обработки и трансформации данных
+
+# HTTP Requests
+requests==2.31.0            # Для HTTP запросов (если потребуется)
+
