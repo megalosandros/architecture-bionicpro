@@ -17,4 +17,11 @@
 3. Отключен Resource Owner Password Credentials Grant (ROPC)
 4. PKCE с алгоритмом SHA256
 
+#### Скриншоты использования PKCE
+1. Запрос авторизации
+   - *GET /auth - Отправка code_challenge с методом S256*
 
+2. Получение токена
+   - *POST /token - Верификация с помощью code_verifier*
+
+![pkce](screenshots/task1_2.png)
