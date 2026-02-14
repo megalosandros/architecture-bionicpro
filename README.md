@@ -37,6 +37,39 @@
 
 **Airflow создан в** [папке](airflow)
 
+
+#### Запуск локально
+
+Из корня репозитория:
+
+```bash
+docker compose up -d
+#
+# подождать завершения инициализации :-)
+# затем создать подключения
+
+chmod +x airflow/setup-airflow-connections.sh
+airflow/setup-airflow-connections.sh
+````
+
+После старта стенда:
+
+1. Открыть UI Airflow: `http://localhost:8081`
+   Логин/пароль создаются автоматически: `admin / admin`.
+
+2. В списке DAG’ов найти `bionicpro_etl_pipeline` и включить (тумблер в состояние **On**).
+
+3. Для проверки работы можно вручную запустить DAG через кнопку **Trigger DAG** в UI.
+
+#### Проверка результата
+
+```bash
+docker compose exec clickhouse clickhouse-client --query \
+  "SELECT * FROM bionicpro_analytics.customer_prosthesis_report LIMIT 3 FORMAT Vertical;"
+```
+
+#### Скриншоты
+
 1. Ручной запуск DAG 
 
 ![DAG flow](screenshots/task2_2_table.png)
@@ -48,6 +81,33 @@
 3. Запрос отчета
 
 ![DAG report](screenshots/task2_2_screen.png)
+
+
+### Задача 3. Создайте бэкенд-часть приложения для API
+### Задача 4. Реализуйте ограничение доступа к эндпоинту отчётности
+
+**Маппинг пользователей для справки**
+
+| Keycloak Username | Keycloack UUID | Имя в CRM |
+|-------------------|----------------|-----------|
+| user1      | 1ebd24ab-87e6-40ce-a1bd-ded5aa9d205e | Иван Петров |
+| user2      | 61c813cd-2251-4a29-9415-57fec09a8c8f | Мария Сидорова |
+| prothetic1 | d0ec1834-b77d-4e3a-9ba5-1ce10ac6855c | Сергей Протезов |
+| prothetic2 | 5fb8041c-4e30-41ea-bd32-d075859100b8 | Елена Тестова |
+| prothetic3 | 043f5200-eab2-4d13-9c7e-01b84ba26d94 | Дмитрий Калибров |
+| admin1     | 6e102ed8-120e-4ef0-a20c-1b4edfc54702 | НЕ в CRM |
+
+
+**Backend создан в** [папке](airflow)
+
+#### Скриншоты запросов к Backend
+
+1. Получить токен авторизации
+2. Убедиться, что токен получен
+3. Сделать запрос к /reports с этим токеном
+4. Убедиться, что в отчете получены данные только "про себя"
+
+![report](screenshots/task2_4.png)
 
 
 
