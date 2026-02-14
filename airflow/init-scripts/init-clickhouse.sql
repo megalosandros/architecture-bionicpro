@@ -1,7 +1,30 @@
--- Инициализация ClickHouse для OLAP аналитики
+-- =========================================================================
+-- Инициализация ClickHouse для BionicPRO
+-- =========================================================================
 
 -- Создание базы данных
 CREATE DATABASE IF NOT EXISTS bionicpro_analytics;
+
+-- Таблица детальной телеметрии (реплика из PostgreSQL)
+CREATE TABLE IF NOT EXISTS bionicpro_analytics.telemetry_detailed
+(
+    id UInt64,
+    prosthesis_id String,
+    user_id String,
+    timestamp DateTime,
+    sensor_data String,
+    battery_level UInt8,
+    movement_type String,
+    response_time_ms UInt32,
+    error_code String,
+    signal_quality Float32,
+    created_at DateTime
+)
+ENGINE = MergeTree()
+PARTITION BY toYYYYMM(timestamp)
+ORDER BY (user_id, prosthesis_id, timestamp)
+SETTINGS index_granularity = 8192
+COMMENT 'Детальная телеметрия (реплика из PostgreSQL)';
 
 -- Таблица агрегированной телеметрии
 CREATE TABLE IF NOT EXISTS bionicpro_analytics.telemetry_aggregated
@@ -25,7 +48,8 @@ CREATE TABLE IF NOT EXISTS bionicpro_analytics.telemetry_aggregated
 ENGINE = MergeTree()
 PARTITION BY toYYYYMM(date)
 ORDER BY (user_id, prosthesis_id, date, hour)
-SETTINGS index_granularity = 8192;
+SETTINGS index_granularity = 8192
+COMMENT 'Агрегированная телеметрия по часам';
 
 -- Таблица витрины для отчетов (объединение CRM + Телеметрия)
 CREATE TABLE IF NOT EXISTS bionicpro_analytics.customer_prosthesis_report
@@ -70,51 +94,5 @@ CREATE TABLE IF NOT EXISTS bionicpro_analytics.customer_prosthesis_report
 ENGINE = ReplacingMergeTree(report_generated_at)
 PARTITION BY toYYYYMM(order_date)
 ORDER BY (customer_id, prosthesis_id)
-SETTINGS index_granularity = 8192;
-
--- Таблица детальной телеметрии (реплика из PostgreSQL)
-CREATE TABLE IF NOT EXISTS bionicpro_analytics.telemetry_detailed
-(
-    id UInt64,
-    prosthesis_id String,
-    user_id String,
-    timestamp DateTime,
-    sensor_data String,
-    battery_level UInt8,
-    movement_type String,
-    response_time_ms UInt32,
-    error_code String,
-    signal_quality Float32,
-    created_at DateTime
-)
-ENGINE = MergeTree()
-PARTITION BY toYYYYMM(timestamp)
-ORDER BY (user_id, prosthesis_id, timestamp)
-SETTINGS index_granularity = 8192;
-
--- Материализованное представление для автоматической агрегации
-CREATE MATERIALIZED VIEW IF NOT EXISTS bionicpro_analytics.telemetry_aggregated_mv
-TO bionicpro_analytics.telemetry_aggregated
-AS
-SELECT
-    user_id,
-    prosthesis_id,
-    toDate(timestamp) as date,
-    toHour(timestamp) as hour,
-    count() as total_events,
-    avg(battery_level) as avg_battery_level,
-    min(battery_level) as min_battery_level,
-    max(battery_level) as max_battery_level,
-    avg(response_time_ms) as avg_response_time_ms,
-    min(response_time_ms) as min_response_time_ms,
-    max(response_time_ms) as max_response_time_ms,
-    avg(signal_quality) as avg_signal_quality,
-    sumMap(map(movement_type, 1)) as movement_counts,
-    sumMap(map(error_code, 1)) as error_counts,
-    now() as created_at
-FROM bionicpro_analytics.telemetry_detailed
-GROUP BY user_id, prosthesis_id, date, hour;
-
-COMMENT ON TABLE bionicpro_analytics.telemetry_aggregated IS 'Агрегированная телеметрия по часам';
-COMMENT ON TABLE bionicpro_analytics.customer_prosthesis_report IS 'Витрина данных для сервиса отчетов';
-COMMENT ON TABLE bionicpro_analytics.telemetry_detailed IS 'Детальная телеметрия (реплика из PostgreSQL)';
+SETTINGS index_granularity = 8192
+COMMENT 'Витрина данных для сервиса отчетов';

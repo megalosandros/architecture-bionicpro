@@ -251,6 +251,7 @@ def prepare_data_mart(**context):
             'most_common_movement': stats[4] if stats[4] else '',
             'total_errors': stats[5],
             'last_telemetry_date': stats[6],
+            'report_generated_at': datetime.now(),
             'data_actual_as_of': datetime.now()
         }
         

@@ -128,15 +128,15 @@ services:
 
   # ClickHouse - OLAP для аналитики
   clickhouse:
-    image: clickhouse/clickhouse-server:24.1
+    image: clickhouse/clickhouse-server:25.12
     environment:
       CLICKHOUSE_DB: bionicpro_analytics
       CLICKHOUSE_USER: clickhouse_user
       CLICKHOUSE_PASSWORD: clickhouse_password
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
     volumes:
-      - clickhouse-data:/var/lib/clickhouse
       - ./airflow/init-scripts/init-clickhouse.sql:/docker-entrypoint-initdb.d/init.sql
+      - clickhouse-data:/var/lib/clickhouse
     ports:
       - "8123:8123"
       - "9000:9000"

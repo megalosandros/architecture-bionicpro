@@ -17,29 +17,15 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
-# Определяем имя проекта (директории)
-PROJECT_NAME=$(basename "$PWD")
-
-# Определяем имя контейнера webserver
-WEBSERVER_CONTAINER="${PROJECT_NAME}-airflow_webserver-1"
-
 # Проверяем, запущен ли Airflow
 echo -e "${YELLOW}Проверка доступности Airflow...${NC}"
-if ! docker ps --format '{{.Names}}' | grep -q "airflow_webserver"; then
+if ! docker compose ps | grep -q "airflow_webserver"; then
     echo -e "${RED}✗ Airflow webserver не запущен${NC}"
-    echo "Сначала запустите сервисы: docker-compose up -d"
+    echo "Сначала запустите сервисы: docker compose up -d"
     exit 1
 fi
 
-# Находим правильное имя контейнера
-WEBSERVER_CONTAINER=$(docker ps --format '{{.Names}}' | grep airflow_webserver | head -n 1)
-
-if [ -z "$WEBSERVER_CONTAINER" ]; then
-    echo -e "${RED}✗ Не удалось найти контейнер Airflow webserver${NC}"
-    exit 1
-fi
-
-echo -e "${GREEN}✓ Найден контейнер: $WEBSERVER_CONTAINER${NC}"
+echo -e "${GREEN}✓ Airflow webserver запущен${NC}"
 echo ""
 
 # Функция для создания подключения
@@ -55,10 +41,10 @@ create_connection() {
     echo -e "${YELLOW}Создание подключения: $conn_id${NC}"
     
     # Удаляем существующее подключение (игнорируем ошибки)
-    docker exec "$WEBSERVER_CONTAINER" airflow connections delete "$conn_id" 2>/dev/null || true
+    docker compose exec -T airflow_webserver airflow connections delete "$conn_id" 2>/dev/null || true
     
     # Создаем новое подключение
-    if docker exec "$WEBSERVER_CONTAINER" airflow connections add "$conn_id" \
+    if docker compose exec -T airflow_webserver airflow connections add "$conn_id" \
         --conn-type "$conn_type" \
         --conn-host "$host" \
         --conn-schema "$schema" \
@@ -102,7 +88,7 @@ echo -e "${GREEN}Проверка созданных подключений${NC}
 echo "================================="
 echo ""
 
-if docker exec "$WEBSERVER_CONTAINER" airflow connections list | grep -E "(crm_db_conn|postgres_main_conn)"; then
+if docker compose exec -T airflow_webserver airflow connections list | grep -E "(crm_db_conn|postgres_main_conn)"; then
     echo ""
     echo -e "${GREEN}✓ Все подключения успешно созданы!${NC}"
 else

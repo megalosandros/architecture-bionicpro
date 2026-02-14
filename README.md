@@ -35,3 +35,20 @@
 
 ### Задача 2. Разработать Airflow DAG и настроить его на запуск по расписанию
 
+**Airflow создан в** [папке](airflow)
+
+1. Ручной запуск DAG 
+
+![DAG flow](screenshots/task2_2_table.png)
+
+2. DAG graph view
+
+![DAG graph](screenshots/task2_2_graph.png)
+
+3. Запрос отчета
+
+![DAG report](screenshots/task2_2_screen.png)
+
+
+
+

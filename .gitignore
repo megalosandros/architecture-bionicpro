@@ -1,2 +1,8 @@
 /postgres-keycloak-data
 2024__yandex-architecture-sso.code-workspace
+__pycache__/
+logs/
+diagnose_etl.sh
+quick_check.sh
+
+
