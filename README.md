@@ -110,5 +110,14 @@ docker compose exec clickhouse clickhouse-client --query \
 ![report](screenshots/task2_4.png)
 
 
+### Задача 5. Добавьте в UI кнопку получения отчёта и вызова эндпоинта его генерации
+
+
+**Frontend обновлен в** [папке](frontend)
+
+#### Скриншот построения отчета
+
+![report](screenshots/task2_5.png)
+
 
 
