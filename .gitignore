@@ -1,2 +1,11 @@
 /postgres-keycloak-data
 2024__yandex-architecture-sso.code-workspace
+__pycache__/
+airflow/logs/
+airflow/config/
+airflow/plugins/
+
+diagnose_etl.sh
+quick_check.sh
+
+
